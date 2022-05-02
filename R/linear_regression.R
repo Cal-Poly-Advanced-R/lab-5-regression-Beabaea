@@ -24,11 +24,11 @@ simple_linear_regression <- function(dat, response, explanatory, method = NULL){
 
   ### Edit code after here
 
-  sd_x <- 1
-  sd_y <- 1
+  sd_x <- sd(x,na.rm=T)
+  sd_y <- sd(y,na.rm=T)
 
-  beta_0 <- 1
-  beta_1 <- 1
+  beta_1 <- (cor(x,y)) * (sd_y/sd_x)
+  beta_0 <- y_bar - beta_1 * x_bar
 
   ### Stop editing
 
