@@ -64,10 +64,28 @@ simple_linear_regression <- function(dat, response, explanatory, method = NULL){
 #'@export
 multiple_linear_regression <- function(dat, response, method = NULL) {
 
+  #get the names of the explanatory variables
+  names<-c(names(dat),"Intercept")
+
+  #make matrices
+  #response matrix
+  y<-dat%>%select({{response}}) #{{response}}
+  y<-data.matrix(y)
+
+  #slope and intercept matrix
+  x<-dat %>%
+    select(-{{response}}) %>% #{{response}}
+    mutate(Intercept=1) #maybe need to change order?
+  x<-data.matrix(x)
+
+  #solve for matrix
+  #(t(x)*x)^-1 * t(x) * y
+  result_matrix<-solve(t(x) %*% x) %*% t(x) %*% y
 
 
-  results <- 0 ### This should be a data frame, with columns named
-                ### "Intercept" and the same variable names as dat.
+  results <- data.frame(t(result_matrix))
+  ### This should be a data frame, with columns names
+  ### "Intercept" and the same variable names as dat.
 
   return(results)
 
