@@ -16,7 +16,22 @@
 #' @export
 predict_from_coefs <- function(dat, response, coefs){
 
+  #first let make the df of coeff
+  a<-data.matrix(coefs)
 
+  #now lets make the x data frame
+  x<-cbind(1, dat %>% select(-{{response}}))
+  #align names
+  names(x)<-names(coefs)
+  #into matrix form
+  x<-data.matrix(x)
 
+  #now multiply to get predicted results
+  predicted<- a %*% x
+  observed<- dat %>% select({{response}})
+
+  #formulate results
+  results<-data.frame(cbind(predicted,observed))
+  return(results)
 
 }
