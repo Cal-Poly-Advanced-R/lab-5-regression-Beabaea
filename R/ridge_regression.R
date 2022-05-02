@@ -18,9 +18,21 @@
 #' @export
 ridge_regression <- function(dat, response, lambda) {
 
+  #equation for beta
+  #beta = (t(x)*x + lambda(I))-1 * t(x)Y
 
+  #first lets create the matrices
+  x <-data.matrix(dat%>%
+                   select(-{{response}}) %>%
+                   mutate( Intercept = 1))
+  y <- data.matrix(dat%>%
+                  select({{response}}))
+  i <- ncol(x)
 
-  results <- 0
+  #now the math
+  beta<-solve(t(x)%*%x + lambda*diag(i)) %*% (t(x) %*% y)
+
+  results <- data.frame(t(beta))
   ### This should be a data frame, with columns named
   ### "Intercept" and the same variable names as dat, and also a column
   ### called "lambda".
