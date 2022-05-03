@@ -18,25 +18,8 @@
 #' @export
 ridge_regression <- function(dat, response, lambda) {
 
-  #equation for beta
-  #beta = (t(x)*x + lambda(I))-1 * t(x)Y
-
-  #first lets create the matrices
-  x <-data.matrix(dat%>%
-                   select(-{{response}}) %>%
-                   mutate( Intercept = 1))
-  y <- data.matrix(dat%>%
-                  select({{response}}))
-  i <- ncol(x)
-
-  #now the math
-  beta<-solve(t(x)%*%x + lambda*diag(i)) %*% (t(x) %*% y)
-
-  results <- data.frame(t(beta))
-  ### This should be a data frame, with columns named
-  ### "Intercept" and the same variable names as dat, and also a column
-  ### called "lambda".
-
+  results<-sapply(lambda,FUN=single_ridge_regression,dat={{dat}},response={{response}})
+  #results<-unlist(results)
   return(results)
 
 }
@@ -67,4 +50,48 @@ find_best_lambda <- function(train_dat, test_dat, response, lambdas) {
   ### on the test dataset.
 
   return(lambda_errors)
+}
+
+#'Runs a ridge regression for a single lambda
+#'
+#'
+#' @param dat A data frame
+#' @param response The name of a response variable in the data frame (unquoted)
+#' @param lambda A numeric value of a penalty terms to try
+#'
+#' @return A data frame of coefficients
+#'
+#' @import dplyr
+#'
+#' @export
+#'
+single_ridge_regression<-function(dat, response, lambda) {
+
+  #equation for beta
+  #beta = (t(x)*x + lambda(I))-1 * t(x)Y
+
+  #first lets create the matrices
+  x <-data.matrix(dat%>%
+                    select(-{{response}})%>%
+                    scale())#scale
+  names<-names(dat%>%
+                 select(-{{response}}))#save var names
+  x<-cbind(1,x) #add intercept
+  colnames(x)<-c("Intercept",names) #give intercept name
+
+  y <- data.matrix(dat%>%
+                     select({{response}}))
+  i <- ncol(x)
+
+
+
+  #now the math
+  beta<-solve(t(x)%*%x + lambda*diag(i)) %*% (t(x) %*% y)
+
+  results <- data.frame(t(beta))%>%mutate(lambda=lambda)
+  ### This should be a data frame, with columns named
+  ### "Intercept" and the same variable names as dat, and also a column
+  ### called "lambda".
+
+  return(results)
 }
