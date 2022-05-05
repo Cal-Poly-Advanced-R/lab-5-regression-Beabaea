@@ -47,24 +47,44 @@ ridge_regression <- function(dat, response, lambda) {
 find_best_lambda <- function(train_dat, test_dat, response, lambdas) {
 
   #make dataframe of coeff and lambda
-  coeflambda <- ridge_regression(train_dat, mpg, lambdas)
+  coeflambda <- ridge_regression({{train_dat}}, {{response}}, {{lambdas}})
+
+  #list of data frames with only the coefficient
+  coefs <- split( coeflambda[,-4], seq(nrow(coeflambda)) )
 
   #make an x and expected dataframe using the test_data
-  x <- as.matrix(test_dat%>%select(-mpg))
+  x <- as.matrix(test_dat%>%select(-{{response}}))
   x <- cbind(1,x)
   expected <- test_dat%>%select({{response}})
 
-  #making a function cuz its easier
+  #making a function bc its easier
   RRerror <- function(coef,x,expected){
-    calc <- x %*% coef
+
+    #need to take a data frame and make it a usable matrix
+    mcoef<-t(data.matrix({{coef}}))
+
+    #doing the math
+    calc <- x %*% mcoef
+
+    #calulate the differences and sum of squares
     diff <- (expected-calc)^2
-    result <- sum(diff)/rnow(diff)
-    return(result)
-  }
+    result <- sum(diff)
+
+    return(result)#should return a number
+    }
+
+  #example: MAKE SURE THIS WORKS
+  RRerror(coefs[[1]],x,expected)
+  #this function will take the list and use it to make df of list
+  errors<-purrr::map_dfr(coefs,~RRerror(.x,x,expected))
+
+  lambda_errors<-as.data.frame(cbind(coeflambda$lambda,t(errors)))
+  names(lambda_errors)<-c("lambda","error")
   ### lambda_errors should be a data frame with two columns: "lambda" and "error"
   ### For each lambda, you should record the resulting Sum of Squared error
   ### (i.e., the predicted value minus the real value squared) from prediction
   ### on the test dataset.
+
 
   return(lambda_errors)
 }
