@@ -46,7 +46,21 @@ ridge_regression <- function(dat, response, lambda) {
 #' @export
 find_best_lambda <- function(train_dat, test_dat, response, lambdas) {
 
+  #make dataframe of coeff and lambda
+  coeflambda <- ridge_regression(train_dat, mpg, lambdas)
 
+  #make an x and expected dataframe using the test_data
+  x <- as.matrix(test_dat%>%select(-mpg))
+  x <- cbind(1,x)
+  expected <- test_dat%>%select({{response}})
+
+  #making a function cuz its easier
+  RRerror <- function(coef,x,expected){
+    calc <- x %*% coef
+    diff <- (expected-calc)^2
+    result <- sum(diff)/rnow(diff)
+    return(result)
+  }
   ### lambda_errors should be a data frame with two columns: "lambda" and "error"
   ### For each lambda, you should record the resulting Sum of Squared error
   ### (i.e., the predicted value minus the real value squared) from prediction
