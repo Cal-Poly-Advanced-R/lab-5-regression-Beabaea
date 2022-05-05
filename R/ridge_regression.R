@@ -18,8 +18,11 @@
 #' @export
 ridge_regression <- function(dat, response, lambda) {
 
-  results<-sapply(lambda,FUN=single_ridge_regression,dat={{dat}},response={{response}})
-  #results<-unlist(results)
+  results <- lapply(lambda, FUN=single_ridge_regression,
+                    dat={{dat}}, response={{response}})
+  #result <- purrr::map_dfr(lambda, ~ single_ridge_regression({{dat}}, {{response}}, .x))
+  #results<-data.frame(t(results))
+  results <- data.table::rbindlist(results)
   return(results)
 
 }
