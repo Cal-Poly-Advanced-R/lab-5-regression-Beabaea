@@ -86,7 +86,7 @@ single_ridge_regression<-function(dat, response, lambda) {
 
 
   #now the math
-  beta<-solve(t(x)%*%x + lambda*diag(i)) %*% (t(x) %*% y)
+  beta<-solve(crossprod(x) + lambda*diag(i)) %*% crossprod(x,y)
 
   results <- data.frame(t(beta))%>%mutate(lambda=lambda)
   ### This should be a data frame, with columns named

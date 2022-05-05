@@ -80,7 +80,7 @@ multiple_linear_regression <- function(dat, response, method = NULL) {
 
   #solve for matrix
   #(t(x)*x)^-1 * t(x) * y
-  result_matrix<-solve(t(x) %*% x) %*% t(x) %*% y
+  result_matrix<-solve(crossprod(x)) %*% crossprod(x, y)
 
 
   results <- data.frame(t(result_matrix))
