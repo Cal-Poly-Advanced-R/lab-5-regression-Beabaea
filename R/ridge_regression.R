@@ -20,8 +20,6 @@ ridge_regression <- function(dat, response, lambda) {
 
   results <- lapply(lambda, FUN=single_ridge_regression,
                     dat={{dat}}, response={{response}})
-  #result <- purrr::map_dfr(lambda, ~ single_ridge_regression({{dat}}, {{response}}, .x))
-  #results<-data.frame(t(results))
   results <- data.table::rbindlist(results)
   return(results)
 
@@ -73,18 +71,12 @@ find_best_lambda <- function(train_dat, test_dat, response, lambdas) {
     return(result)#should return a number
     }
 
-  #example: MAKE SURE THIS WORKS
-  RRerror(coefs[[1]],x,expected)
   #this function will take the list and use it to make df of list
   errors<-purrr::map_dfr(coefs,~RRerror(.x,x,expected))
 
+  #creating the dataframe and renaming
   lambda_errors<-as.data.frame(cbind(coeflambda$lambda,t(errors)))
   names(lambda_errors)<-c("lambda","error")
-  ### lambda_errors should be a data frame with two columns: "lambda" and "error"
-  ### For each lambda, you should record the resulting Sum of Squared error
-  ### (i.e., the predicted value minus the real value squared) from prediction
-  ### on the test dataset.
-
 
   return(lambda_errors)
 }
